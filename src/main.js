@@ -11,17 +11,21 @@ const galleryEl = document.querySelector('.js-gallery');
 const createGalleryTemplate = imgData => {
   return `
   <li class="gallery-card">
-    <img class="gallery-img" src="${imgData.webformatURL}" alt="${imgData.tags}" />
+  <a class="gallery-link" href=${imgData.largeImageURL}>
+    <img class="gallery-img" src="${imgData.webformatURL}" alt="${imgData.tags}" data-source=${imgData.largeImageURL} />
+  </a>
+<div class="data-wrapper">
 <ul class="img-info">
-  <li><p class="param-name">Likes</p>
+  <li class="param-info"><h2 class="param-name">Likes</h2>
   <p>${imgData.likes}</p></li>
-  <li><p class="param-name">Views</p>
+  <li class="param-info"><h2 class="param-name">Views</h2>
   <p>${imgData.views}</p></li>
-  <li><p class="param-name">Comments</p>
+  <li class="param-info"><h2 class="param-name">Comments</h2>
   <p>${imgData.comments}</p></li>
-  <li><p class="param-name">Downloads</p>
+  <li class="param-info"><h2 class="param-name">Downloads</h2>
   <p>${imgData.downloads}</p></li>
 </ul>
+</div>
   </li>
   `;
 };
@@ -61,30 +65,42 @@ const onFormSubmit = event => {
       } else {
           const galleryCardsTemplate = data.hits.map(imgInfo => createGalleryTemplate(imgInfo)).join('');
 
-      galleryEl.innerHTML = galleryCardsTemplate;
+        galleryEl.innerHTML = galleryCardsTemplate;
+        
+        const onSingleImageClick = event => {
+  event.preventDefault();
+
+  if (event.target === event.currentTarget) {
+    return;
+  };
+
+  const imgItem = event.target.closest('.gallery-img');
+  const imgSource = imgItem.dataset.source;
+  const imgInfo = data.hits.find(image => image.largeImageURL === imgSource);
+
+  const modalInstance =  basicLightbox.create(
+    `
+  <img
+    class="gallery-img"
+    src=${imgInfo.largeImageURL}
+    data-source=${imgInfo.largeImageURL}
+    alt=${imgInfo.tags}
+  />
+    `
+  );
+
+  modalInstance.show();
+};
+
+galleryEl.addEventListener('click', onSingleImageClick);
     }
     })
     .catch(err => {
       console.log(err);
     });
+  
+  galleryEl.innerHTML = '';
+  
 }
 
-// searchForm.addEventListener('submit', onFormSubmit);
-
-//   const imgItem = event.target.closest('.gallery-image');
-//   const imgSource = imgItem.dataset.source;
-//   const imgInfo = images.find(image => image.original === imgSource);
-
-//   const modalInstance =  basicLightbox.create(
-//     `
-//   <img
-//     class="gallery-image"
-//     src=${imgInfo.original}
-//     data-source=${imgInfo.original}
-//     alt=${imgInfo.description}
-//   />
-//     `
-//   );
-
-//   modalInstance.show();
-// };
+searchForm.addEventListener('submit', onFormSubmit);
