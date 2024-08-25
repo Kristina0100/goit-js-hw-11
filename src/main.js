@@ -20,8 +20,8 @@ const onFormSubmit = event => {
     if (!inputValue) {
       iziToast.warning({
       message: 'Please enter a search term',
-      closeOnClick: true,
       position: 'topRight',
+      closeOnClick: true,
 });
     return;
   }
