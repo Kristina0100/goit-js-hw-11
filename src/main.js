@@ -4,51 +4,33 @@ import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+import { createGalleryTemplate } from '/js/render-functions';
+import { fetchPhotos } from '/js/pixabay-api';
 
-const searchForm = document.querySelector('.js-search-form');
+
+const searchFormEl = document.querySelector('.js-search-form');
 const galleryEl = document.querySelector('.js-gallery');
-
-const createGalleryTemplate = imgData => {
-  return `
-  <li class="gallery-card">
-  <a class="gallery-link" href=${imgData.largeImageURL}>
-    <img class="gallery-img" src="${imgData.webformatURL}" alt="${imgData.tags}" data-source=${imgData.largeImageURL} />
-  </a>
-<div class="data-wrapper">
-<ul class="img-info">
-  <li class="param-info"><h2 class="param-name">Likes</h2>
-  <p>${imgData.likes}</p></li>
-  <li class="param-info"><h2 class="param-name">Views</h2>
-  <p>${imgData.views}</p></li>
-  <li class="param-info"><h2 class="param-name">Comments</h2>
-  <p>${imgData.comments}</p></li>
-  <li class="param-info"><h2 class="param-name">Downloads</h2>
-  <p>${imgData.downloads}</p></li>
-</ul>
-</div>
-  </li>
-  `;
-};
+const loaderEl = document.querySelector('.js-loader');
 
 const onFormSubmit = event => {
-    event.preventDefault();
+  event.preventDefault();
 
-  const inputValue = searchForm.elements.query.value;
+  const inputValue = searchFormEl.elements.query.value.trim();
 
-  fetch(
-    `https://pixabay.com/api/?key=30578441-e990d3db57773391ef0ba167f&q=${inputValue}&image_type=photo&orientation=horizontal&safesearch=true`
-  )
-    
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(response.status);
-      }
+    if (!inputValue) {
+      iziToast.warning({
+      message: 'Please enter a search term',
+      closeOnClick: true,
+      position: 'topRight',
+});
+    return;
+  }
 
-      return response.json();
-    })
+  loaderEl.classList.remove("is-hidden");
+  galleryEl.innerHTML = '';
+
+fetchPhotos(inputValue)
     .then(data => {
-      console.log(data);
-
       if (data.total === 0) {
         iziToast.show({
           message: `Sorry, there are no images matching your search query. Please try again!`,
@@ -57,50 +39,36 @@ const onFormSubmit = event => {
           messageLineHeight: '24px',
           iconUrl: '/img/error.svg',
           backgroundColor: '#EF4040',
-          maxWidth: '330px',
+          maxWidth: '350px',
           closeOnClick: true,
           position: 'topRight',
           progressBarColor: '#B51B1B',
-        })
-      } else {
-          const galleryCardsTemplate = data.hits.map(imgInfo => createGalleryTemplate(imgInfo)).join('');
+        });
 
-        galleryEl.innerHTML = galleryCardsTemplate;
-        
-        const onSingleImageClick = event => {
-  event.preventDefault();
+        loaderEl.classList.add("is-hidden");
+        galleryEl.innerHTML = '';
+        searchFormEl.reset();
 
-  if (event.target === event.currentTarget) {
-    return;
-  };
+        return
+      };
 
-  const imgItem = event.target.closest('.gallery-img');
-  const imgSource = imgItem.dataset.source;
-  const imgInfo = data.hits.find(image => image.largeImageURL === imgSource);
+      loaderEl.classList.add("is-hidden");
 
-  const modalInstance =  basicLightbox.create(
-    `
-  <img
-    class="gallery-img"
-    src=${imgInfo.largeImageURL}
-    data-source=${imgInfo.largeImageURL}
-    alt=${imgInfo.tags}
-  />
-    `
-  );
+      const galleryCardsTemplate = data.hits.map(imgInfo => createGalleryTemplate(imgInfo)).join('');
+      galleryEl.innerHTML = galleryCardsTemplate;
+                
+      const lightbox = new SimpleLightbox('.gallery a', {
+        captionsData: 'alt',
+        captionDelay: 250,
+      });
 
-  modalInstance.show();
-};
-
-galleryEl.addEventListener('click', onSingleImageClick);
+      lightbox.refresh();
     }
-    })
+    )
     .catch(err => {
       console.log(err);
     });
-  
-  galleryEl.innerHTML = '';
-  
-}
 
-searchForm.addEventListener('submit', onFormSubmit);
+};
+
+searchFormEl.addEventListener('submit', onFormSubmit)
