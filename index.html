@@ -16,23 +16,25 @@
     
     <title>Task</title>
     <script type="module" crossorigin src="/goit-js-hw-11/commonHelpers.js"></script>
-    <link rel="modulepreload" crossorigin href="/goit-js-hw-11/assets/vendor-8e8cd629.js">
+    <link rel="modulepreload" crossorigin href="/goit-js-hw-11/assets/vendor-8c59ed88.js">
     <link rel="stylesheet" href="/goit-js-hw-11/assets/vendor-1cd1f9d9.css">
-    <link rel="stylesheet" href="/goit-js-hw-11/assets/index-6bc8a6f5.css">
+    <link rel="stylesheet" href="/goit-js-hw-11/assets/index-c6232f48.css">
   </head>
   <body>
     <section class="gallery-section">
       <form class="search-form js-search-form">
         <input
-          class="search-input js-search-input"
+          class="search-input"
           type="text"
           name="query"
-          required=""
+          placeholder="Search photos..."
         />
         <button class="search-btn" type="submit">Search</button>
       </form>
+      <div class="loader-container">
+        <span class="loader js-loader is-hidden"></span>
+      </div>
       <ul class="gallery js-gallery"></ul>
-      <span class="loader js-loader is-hidden"></span>
     </section>
     
   </body>
