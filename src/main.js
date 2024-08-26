@@ -10,7 +10,7 @@ import { fetchPhotos } from '/js/pixabay-api';
 
 const searchFormEl = document.querySelector('.js-search-form');
 const galleryEl = document.querySelector('.js-gallery');
-const loaderEl = document.querySelector('.js-loader');
+const loaderEl = document.querySelector('.loader');
 
 const onFormSubmit = event => {
   event.preventDefault();
@@ -67,6 +67,23 @@ fetchPhotos(inputValue)
     )
     .catch(err => {
       console.log(err);
+
+      iziToast.show({
+      title: 'Error',
+      message: `Something went wrong. Please try again later.`,
+      messageColor: '#fff',
+      titleColor: '#fff',
+      messageSize: '16px',
+      messageLineHeight: '24px',
+      position: 'topRight',
+      closeOnClick: true,
+      maxWidth: '420px',
+      backgroundColor: '#EF4040',
+      progressBarColor: '#B51B1B',
+      iconUrl: '/img/error.svg',
+    });
+
+      loaderEl.classList.add("is-hidden");
     });
 
 };

@@ -157,6 +157,7 @@ input:focus {
 .loader-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
   margin-top: 20px;
 }
@@ -174,13 +175,6 @@ input:focus {
 
 .loader.is-hidden {
   display: none;
-}
-
-.loader::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
 @keyframes rotation {
